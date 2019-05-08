@@ -1,0 +1,24 @@
+{
+  "name": "learnethereum",
+  "version": "1.0.0",
+  "description": "Deploy contracts for the learning",
+  "main": "deploy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://brooklynphotos@github.com/brooklynphotos/learnethereum.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brooklynphotos/learnethereum/issues"
+  },
+  "homepage": "https://github.com/brooklynphotos/learnethereum#readme",
+  "dependencies": {
+    "fs" : "0.0.1-security",
+    "solc": "^0.5.8",
+    "web3": "^1.0.0-beta.54"
+  }
+}
