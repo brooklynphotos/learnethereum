@@ -8,6 +8,14 @@ contract CrowdFundingWithDeadline {
   uint public fundingDeadline;
   address public beneficiary;
   State public state;
+  mapping(address => uint256) public amounts;
+  bool public collected;
+  uint public totalCollected;
+
+  modifier inState(State expectedState) {
+    require(state==expectedState, "Invalid state");
+    _;
+  }
 
   constructor(
     string memory contractName,
@@ -24,5 +32,19 @@ contract CrowdFundingWithDeadline {
 
   function currentTime() internal view returns(uint) {
     return now;
+  }
+
+  /**
+   * by convention inbuilt modifier goes before custom modifiers
+   * must be already in the OnGoing state
+   * can pay
+   */
+  function contribute() public payable inState(State.OnGoing) {
+    amounts[msg.sender] += msg.value;
+    totalCollected += msg.value;
+
+    if(totalCollected>=targetAmount){
+      collected = true;
+    }
   }
 }
