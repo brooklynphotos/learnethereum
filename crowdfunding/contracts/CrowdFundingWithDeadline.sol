@@ -6,7 +6,7 @@ contract CrowdFundingWithDeadline {
   string public name;
   uint public targetAmount;
   uint public fundingDeadline;
-  address public beneficiary;
+  address payable beneficiary;
   State public state;
   mapping(address => uint256) public amounts;
   bool public collected;
@@ -21,7 +21,7 @@ contract CrowdFundingWithDeadline {
     string memory contractName,
     uint targetAmountEth,
     uint durationInMin,
-    address beneficiaryAddress
+    address payable beneficiaryAddress
   ) public {
     name = contractName;
     targetAmount = targetAmountEth * 1 ether;
@@ -60,6 +60,23 @@ contract CrowdFundingWithDeadline {
       state = State.Failed;
     }else{
       state = State.Succeeded;
+    }
+  }
+
+  function collect() public inState(State.Succeeded) {
+    if(beneficiary.send(totalCollected)){
+      state = State.PaidOut;
+    }else{
+      state = State.Failed;
+    }
+  }
+
+  function withdraw() public inState(State.Failed) {
+    require(amounts[msg.sender]>0, "Nothing was contributed");
+    amounts[msg.sender] = 0;
+    uint contribution = amounts[msg.sender];
+    if(!msg.sender.send(contribution)){
+      state = State.Failed;
     }
   }
 }
