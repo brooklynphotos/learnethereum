@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 contract CrowdFundingWithDeadline {
-  enum State {onGoing, Failed, Succeeded, PaidOut}
+  enum State {OnGoing, Failed, Succeeded, PaidOut}
 
   string public name;
   uint public targetAmount;
@@ -19,7 +19,7 @@ contract CrowdFundingWithDeadline {
     targetAmount = targetAmountEth * 1 ether;
     fundingDeadline = currentTime() + (durationInMin * 1 minutes);
     beneficiary = beneficiaryAddress;
-    state = State.onGoing;
+    state = State.OnGoing;
   }
 
   function currentTime() internal view returns(uint) {
