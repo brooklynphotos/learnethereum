@@ -40,11 +40,26 @@ contract CrowdFundingWithDeadline {
    * can pay
    */
   function contribute() public payable inState(State.OnGoing) {
+    require(beforeDeadline(), "Too late!");
     amounts[msg.sender] += msg.value;
     totalCollected += msg.value;
 
     if(totalCollected>=targetAmount){
       collected = true;
+    }
+  }
+
+  function beforeDeadline() public view returns(bool) {
+    return currentTime() < fundingDeadline;
+  }
+
+  function finishCrowdFunding() public inState(State.OnGoing) {
+    require(!beforeDeadline(), "Campaign ain't over");
+
+    if(!collected){
+      state = State.Failed;
+    }else{
+      state = State.Succeeded;
     }
   }
 }

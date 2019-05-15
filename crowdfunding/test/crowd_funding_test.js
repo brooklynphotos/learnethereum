@@ -1,4 +1,4 @@
-const CrowdFundingWithDeadline = artifacts.require('./CrowdFundingWithDeadline.sol');
+const CrowdFundingWithDeadline = artifacts.require('./TestCrowdFundingWithDeadline.sol');
 
 const BigNumber = require('./bignumber.js')
 
@@ -11,6 +11,7 @@ contract('CrowdFundingWithDeadline', (accounts)=>{
   const Succeeded = 2;
   const PaidOut = 3;
 
+  const ERROR_MSG = "Returned error: VM Exception while processing transaction: revert";
 
   let contract;
 
@@ -36,6 +37,10 @@ contract('CrowdFundingWithDeadline', (accounts)=>{
     const targetAmount = await contract.targetAmount.call();
     expect(ONE_ETH.isEqualTo(targetAmount)).to.equal(true);
 
+    // funding deadline
+    const fundingDeadline = await contract.fundingDeadline.call();
+    expect(fundingDeadline.toNumber()).to.equal(600);
+
     // beneficiary
     const actualBeneficiary = await contract.beneficiary.call();
     expect(actualBeneficiary).to.equal(beneficiary);
@@ -60,4 +65,39 @@ contract('CrowdFundingWithDeadline', (accounts)=>{
     const expectedTotal = ONE_ETH.times(2);
     expect(expectedTotal.isEqualTo(total)).to.equal(true);
   });
-})
+
+  it('contribute too late', async()=>{
+    try{
+      await contract.setCurrentTime.call(601);
+      await contract.sendTransaction({
+        value: ONE_ETH,
+        from: creator,
+      });
+      expect.fail();
+    }catch(error){
+      expect(error.message).to.equal(ERROR_MSG)
+    }
+  });
+
+  it('crowdfunding succeeded', async ()=>{
+    await contract.contribute({
+      value: ONE_ETH,
+      from: creator,
+    });
+    await contract.setCurrentTime(601);
+    await contract.finishCrowdFunding();
+
+    const currentState = await contract.state.call();
+
+    expect(currentState.valueOf().toNumber()).to.equal(Succeeded);
+  });
+
+  it('crowdfunding failed', async ()=>{
+    await contract.setCurrentTime(601);
+    await contract.finishCrowdFunding();
+
+    const currentState = await contract.state.call();
+
+    expect(currentState.valueOf().toNumber()).to.equal(Failed);
+  })
+});
