@@ -12,8 +12,8 @@ contract TestCrowdFundingWithDeadline is CrowdFundingWithDeadline {
     string memory contractName,
     uint targetAmountEth,
     uint durationInMin,
-    address beneficiaryAddress
-  ) 
+    address payable beneficiaryAddress
+  )
     CrowdFundingWithDeadline(contractName, targetAmountEth, durationInMin, beneficiaryAddress)
     public {}
 

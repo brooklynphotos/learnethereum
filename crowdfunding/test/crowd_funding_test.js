@@ -99,5 +99,18 @@ contract('CrowdFundingWithDeadline', (accounts)=>{
     const currentState = await contract.state.call();
 
     expect(currentState.valueOf().toNumber()).to.equal(Failed);
+  });
+
+  it("event is emitted", async ()=>{
+    await contract.setCurrentTime(601);
+    const transaction = await contract.finishCrowdFunding();
+
+    // emitted events appear in the logs
+    const events = transaction.logs;
+    expect(events.length).to.equal(1);
+
+    const event = events[0];
+    expect(event.args.totalCollected.toNumber()).to.equal(0);
+    expect(event.args.succeeded).to.equal(false);
   })
 });
