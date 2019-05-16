@@ -112,5 +112,5 @@ contract('CrowdFundingWithDeadline', (accounts)=>{
     const event = events[0];
     expect(event.args.totalCollected.toNumber()).to.equal(0);
     expect(event.args.succeeded).to.equal(false);
-  })
+  });
 });
